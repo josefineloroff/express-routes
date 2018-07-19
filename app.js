@@ -1,6 +1,8 @@
 var express = require ("express")
 var app = express()
 var bodyParser = require("body-parser")
+var request = require('request');
+
 
 // tell express to use body-parser
 app.use(bodyParser.urlencoded({extended: true}))
@@ -21,6 +23,25 @@ app.get("/", function(req, res) {
 //     var noise = req.params.noise
 //     res.send("The " + animal + " says " + noise)
 // })
+
+
+app.get("/search", function(req, res) {
+    res.render("search")
+})
+
+// http://www.omdbapi.com/?si=guardians+of+the+galaxy&apikey=thewdb
+// http://www.omdbapi.com/?si=tt3896198&apikey=thewdb
+app.get("/results", function(req, res) {
+    console.log(req.query.search)
+    var query = req.query.search
+    var url ="http://www.omdbapi.com/?s=" + query + "&apikey=thewdb"
+    request(url, function (error, response, body) {
+    if(!error && response.statusCode == 200) {
+        var data = JSON.parse(body)
+        res.render("results", {data: data})
+}
+});
+});
 
 app.get("/fallinlovewith/:thing", function(req, res) {
     var thing = req.params.thing
@@ -70,6 +91,9 @@ app.get("/speak/:animal", function(req, res) {
     console.log(req.body)
     res.redirect("/friends")
 })
+
+
+
 
  var friends = [
     "Rami", "Rowi", "Dani", "Jola", "Babsi"
